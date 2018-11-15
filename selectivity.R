@@ -3,13 +3,6 @@ library(tidyverse)
 selectivity <- function(data, ...){
   data <- data[tidyselect::vars_select(names(data), ...)]
   data <- data[!map_lgl(data, ~all(is.na(.)))]
-  is_binary <- function(x)length(unique(na.omit(x)))==2
-  as_binary <- function(x){
-    if(!is_binary(x))stop("Not coercible to 0/1!")
-    x <- x == unique(na.omit(x))[1]
-    as.numeric(x)
-  }
-  data <- mutate_if(data, is_binary, as_binary)
   data <- data[!is.na(apply(data, 1, possibly(sd, NA), na.rm = TRUE)), ]
   sum <- rowSums(data, na.rm = TRUE)
   suppressWarnings(map(data, cor.test, sum)) %>%
