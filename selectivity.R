@@ -43,4 +43,7 @@ files <- mutate(files,
 
 walk2(files$selectivity,
       here::here("selectivity", files$file) %>% paste0(".txt"),
-      ~cat(paste(pander::pander_return(.x), collapse = "\n"), file = .y))
+      ~.x %>% pander::pander_return() %>%
+        paste(collapse = "\n") %>% 
+        cat(file = .y))
+
