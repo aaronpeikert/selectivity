@@ -6,10 +6,12 @@ selectivity <- function(data, ...){
   data <- data[tidyselect::vars_select(names(data), ...)]
   # remove NA only coumns
   data <- data[!map_lgl(data, ~all(is.na(.)))]
-  # remove variables without variance
+  # remove variables where sd can not be calculated
   data <- data[!is.na(apply(data, 1, possibly(sd, NA), na.rm = TRUE)), ]
   # calc the sum of all items
   sum <- rowSums(data, na.rm = TRUE)
+  # correlate each items with sum, therefore no part-whole-correction
+  # selectiovity will be overestimated, but for ranking this is not problem
   # use cor.test to get confidence intervals, use broom to extract results
   suppressWarnings(map(data, cor.test, sum)) %>%
     map_df(broom::glance) %>%
